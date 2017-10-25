@@ -8,6 +8,11 @@ namespace OPTOblig2
 {
     class Program
     {
+        //1.    2-point cross over
+        //  1.1     Velg range select from parents.
+        //2.    Mutation (LES)
+        //3.    Finn stopp kriterier
+
         static Random rn = new Random();
         //Hardcoded graph
         static int[,] graph =
@@ -48,6 +53,7 @@ namespace OPTOblig2
             Console.ReadLine();
             
         }
+        //Selects parents
         static public void SelectParents(char[] a, char[] b, char[] c, char[] d)
         {
             List<char[]> solutions = new List<char[]>();
