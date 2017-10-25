@@ -27,28 +27,30 @@ namespace OPTOblig2
         static char[] col = { 'R', 'W', 'B' };
         static int mf = graph.GetLength(0);
         static int[] fittness = { mf, mf, mf, mf };
-        static char[] parent1;
-        static char[] parent2;
-        
+        static char[] parent1 = new char[mf];
+        static char[] parent2 = new char[mf];
+        static char[] child1 = new char[mf];
+        static char[] child2 = new char[mf];
+
         static void Main(string[] args)
         {
             char[] init1 = InitSolution();
             char[] init2 = InitSolution();
-            char[] init3 = InitSolution();
-            char[] init4 = InitSolution();
-            
-            Console.Write("Fittness: " + GetFittness(init1) + "\n");
-            PrintCharArray(init1);
-            Console.Write("Fittness: " + GetFittness(init2) + "\n");
-            PrintCharArray(init2);
-            Console.Write("Fittness: " + GetFittness(init3) + "\n");
-            PrintCharArray(init3);
-            Console.Write("Fittness: " + GetFittness(init4) + "\n");
-            PrintCharArray(init4);
+
+            parent1 = init1;
+            parent2 = init2;
+            Console.Write("Fittness: " + GetFittness(parent1) + "\n");
+            PrintCharArray(parent1);
+            Console.Write("Fittness: " + GetFittness(parent2) + "\n");
+            PrintCharArray(parent2);
             
 
-            SelectParents(init1, init2, init3, init4);
-
+            SelectParents(parent1, parent2, child1, child2);
+            Humps();
+            Console.Write("Child 1 Fittness: " + GetFittness(child1) + "\n");
+            PrintCharArray(child1);
+            Console.Write("Child 2 Fittness: " + GetFittness(child2) + "\n");
+            PrintCharArray(child2);
             PrintTest();
             Console.ReadLine();
             
@@ -71,6 +73,31 @@ namespace OPTOblig2
             
             
 
+        }
+        //UNDER TESTING MATING
+        static public void Humps()
+        {
+            int range1 = Rundum(graph.GetLength(0));
+            int range2 = Rundum(graph.GetLength(0));
+            while(range1 == range2)
+            {
+                range2 = Rundum(graph.GetLength(0));
+            }
+            for (int i = 0; i < graph.GetLength(0); i++)
+            {
+                if((i > range1 && i < range2) || (i < range1 && i > range2))
+                {
+                    child1[i] = parent1[i];
+                    child2[i] = parent2[i];
+                }
+                else
+                {
+                    child2[i] = parent1[i];
+                    child1[i] = parent2[i];
+
+                }
+            }
+            Console.Write("Range1: " + range1.ToString() + "\nRange2: " + range2.ToString() + "\n");
         }
         //Calculates fittness of the solution
         static public int GetFittness(char[] c)
