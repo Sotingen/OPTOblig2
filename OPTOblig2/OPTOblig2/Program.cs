@@ -36,22 +36,40 @@ namespace OPTOblig2
         {
             char[] init1 = InitSolution();
             char[] init2 = InitSolution();
+            int iter = 0;
 
             parent1 = init1;
             parent2 = init2;
+
+            int fitOld1 = GetFittness(parent1);
+            int fitOld2 = GetFittness(parent2);
+            int fitNew1 = int.MaxValue;
+            int fitNew2 = int.MaxValue;
             Console.Write("Fittness: " + GetFittness(parent1) + "\n");
             PrintCharArray(parent1);
             Console.Write("Fittness: " + GetFittness(parent2) + "\n");
             PrintCharArray(parent2);
-            
 
-            SelectParents(parent1, parent2, child1, child2);
-            Humps();
-            Console.Write("Child 1 Fittness: " + GetFittness(child1) + "\n");
-            PrintCharArray(child1);
-            Console.Write("Child 2 Fittness: " + GetFittness(child2) + "\n");
-            PrintCharArray(child2);
-            PrintTest();
+            while (iter != 3) {
+                Humps();
+                Mutation();
+                SelectParents(parent1, parent2, child1, child2);
+                fitNew1 = GetFittness(parent1);
+                fitNew2 = GetFittness(parent2);
+                if (fitNew1 >= fitOld1 || fitNew2 >= fitOld2) {
+                    iter++;
+                    //Console.Write("fitnew1 = " + fitNew1 + "fitold1 = " + fitOld1 + "\nfitnew2 = " + fitNew2 + "fitold2 = " + fitOld2 + "\n");
+                }
+                if(fitNew1 < fitOld1 || fitNew2 < fitOld2)
+                    iter = 0;
+                
+            }
+
+            Console.Write("Fittness: " + GetFittness(parent1) + "\n");
+            PrintCharArray(parent1);
+            Console.Write("Fittness: " + GetFittness(parent2) + "\n");
+            PrintCharArray(parent2);
+            //PrintTest();
             Console.ReadLine();
             
         }
@@ -74,7 +92,7 @@ namespace OPTOblig2
             
 
         }
-        //UNDER TESTING MATING
+        //Mates the two parents and creates two children
         static public void Humps()
         {
             int range1 = Rundum(graph.GetLength(0));
@@ -85,7 +103,7 @@ namespace OPTOblig2
             }
             for (int i = 0; i < graph.GetLength(0); i++)
             {
-                if((i > range1 && i < range2) || (i < range1 && i > range2))
+                if((i >= range1 && i <= range2) || (i <= range1 && i >= range2))
                 {
                     child1[i] = parent1[i];
                     child2[i] = parent2[i];
@@ -97,7 +115,7 @@ namespace OPTOblig2
 
                 }
             }
-            Console.Write("Range1: " + range1.ToString() + "\nRange2: " + range2.ToString() + "\n");
+            //Console.Write("Range1: " + range1.ToString() + "\nRange2: " + range2.ToString() + "\n");
         }
         //Calculates fittness of the solution
         static public int GetFittness(char[] c)
@@ -156,6 +174,7 @@ namespace OPTOblig2
                 Console.Write("\n");
             }
         }
+        //Returns index of the best fittness
         static public int CompareFit(int[] fit, int ignore)
         {
             int fittest = mf;
@@ -172,16 +191,38 @@ namespace OPTOblig2
             }
             return index;
         }
+
+        static public void Mutation() {
+            int rnd = Rundum(10);
+            int rndIndex = Rundum(graph.GetLength(0));
+            if(rnd <= 1) {
+                char childnode = child1[rndIndex];
+                char childmut = col[Rundum(3)];
+                while (childnode.Equals(childmut)) {
+                    childmut = col[Rundum(3)];
+                }
+                child1[rndIndex] = childmut;
+            }
+            else if(rnd >= 9) {
+                char childnode = child2[rndIndex];
+                char childmut = col[Rundum(3)];
+                while (childnode.Equals(childmut)) {
+                    childmut = col[Rundum(3)];
+                }
+                child2[rndIndex] = childmut;
+            }
+        }
         
         static public void PrintTest()
         {
-            Console.Write("\n");
-            Print2DArray(graph);
-            Console.Write("\n");
+            //Console.Write("\n");
+            //Print2DArray(graph);
+            //Console.Write("\n");
             Console.Write("Parent1, with fittness: " + GetFittness(parent1) + " : " );
             PrintCharArray(parent1);
             Console.Write("Parent2, with fittness: " + GetFittness(parent2) + " : ");
             PrintCharArray(parent2);
+            Console.Write("\n");
 
         }
     }
