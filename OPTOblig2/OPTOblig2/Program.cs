@@ -9,20 +9,20 @@ namespace OPTOblig2
     class Program
     {
         //1.    2-point cross over
-        //  1.1     Velg range select from parents.
+        //1.1   Velg range select from parents.
         //2.    Mutation (LES)
         //3.    Finn stopp kriterier
 
         static Random rn = new Random();
         //Hardcoded graph
-        static int[,] graph =
-        {
-            {0,1,0,1,0},
-            {1,0,1,0,1},
-            {0,1,0,1,1},
-            {1,0,1,0,0},
-            {0,1,1,0,0}
-            };
+        static int[,] graph = GenerateGraph(20);
+        //{
+        //    {0,1,0,1,0},
+        //    {1,0,1,0,1},
+        //    {0,1,0,1,1},
+        //    {1,0,1,0,0},
+        //    {0,1,1,0,0}
+        //    };
         //Colour Array
         static char[] col = { 'R', 'W', 'B' };
         static int mf = graph.GetLength(0);
@@ -37,7 +37,7 @@ namespace OPTOblig2
             char[] init1 = InitSolution();
             char[] init2 = InitSolution();
             int iter = 0;
-
+            //Initalising parent solustions
             parent1 = init1;
             parent2 = init2;
 
@@ -45,38 +45,61 @@ namespace OPTOblig2
             int fitOld2 = GetFittness(parent2);
             int fitNew1 = int.MaxValue;
             int fitNew2 = int.MaxValue;
-            Console.Write("Fittness: " + GetFittness(parent1) + "\n");
-            PrintCharArray(parent1);
-            Console.Write("Fittness: " + GetFittness(parent2) + "\n");
-            PrintCharArray(parent2);
 
-            while (iter != 3) {
+            Print2DArray(graph);
+
+            while (iter != 10) {
+                //Mates the parents
                 Humps();
+                //20% chance of mutation
                 Mutation();
+                //Selects the new parents
                 SelectParents(parent1, parent2, child1, child2);
                 fitNew1 = GetFittness(parent1);
                 fitNew2 = GetFittness(parent2);
-                if (fitNew1 >= fitOld1 || fitNew2 >= fitOld2) {
-                    iter++;
-                    //Console.Write("fitnew1 = " + fitNew1 + "fitold1 = " + fitOld1 + "\nfitnew2 = " + fitNew2 + "fitold2 = " + fitOld2 + "\n");
-                }
-                if(fitNew1 < fitOld1 || fitNew2 < fitOld2)
+                if ((fitNew1 + fitNew2) < (fitOld1 + fitOld2)) {
                     iter = 0;
-                
+                }
+                else
+                    iter++;
+                fitOld1 = GetFittness(parent1);
+                fitOld2 = GetFittness(parent2);
+                PrintBestParent();
             }
 
-            Console.Write("Fittness: " + GetFittness(parent1) + "\n");
-            PrintCharArray(parent1);
-            Console.Write("Fittness: " + GetFittness(parent2) + "\n");
-            PrintCharArray(parent2);
-            //PrintTest();
+            
             Console.ReadLine();
             
+        }
+        static public int[,] GenerateGraph(int h) {
+            int[,] gruph = new int[h, h];
+            int edge = 0;
+            int count = 0;
+            for(int i = 0; i < h; i++) {
+                count = 0;
+                for (int j = i; j < h; j++) {
+                    if (i == j)
+                        continue;
+                    edge = Rundum(2);
+                    if (edge == 1)
+                        count++;
+                    gruph[i, j] = edge;
+                    gruph[j, i] = edge;
+                }
+                if (count == 0 && i > h-1) {
+                    i--;
+                    
+                }
+                    
+            }
+
+            return gruph;
         }
         //Selects parents
         static public void SelectParents(char[] a, char[] b, char[] c, char[] d)
         {
             List<char[]> solutions = new List<char[]>();
+            solutions.Clear();
             fittness[0] = GetFittness(a);
             fittness[1] = GetFittness(b);
             fittness[2] = GetFittness(c);
@@ -88,9 +111,8 @@ namespace OPTOblig2
             int best1 = CompareFit(fittness, int.MaxValue);
             parent1 = solutions[best1];
             parent2 = solutions[CompareFit(fittness, best1)];
-            
-            
 
+            
         }
         //Mates the two parents and creates two children
         static public void Humps()
@@ -177,8 +199,8 @@ namespace OPTOblig2
         //Returns index of the best fittness
         static public int CompareFit(int[] fit, int ignore)
         {
-            int fittest = mf;
-            int index = mf;
+            int fittest = int.MaxValue;
+            int index = mf-1;
             for(int i = 0; i < fit.GetLength(0); i++)
             {
                 if (ignore == i)
@@ -191,7 +213,7 @@ namespace OPTOblig2
             }
             return index;
         }
-
+        //20% change for mutation of a child
         static public void Mutation() {
             int rnd = Rundum(10);
             int rndIndex = Rundum(graph.GetLength(0));
@@ -212,15 +234,20 @@ namespace OPTOblig2
                 child2[rndIndex] = childmut;
             }
         }
+        //Prints the best out of the two parents
+        static public void PrintBestParent() {
+            if (GetFittness(parent1) < GetFittness(parent2))
+                Console.WriteLine(GetFittness(parent1));
+            else
+                Console.WriteLine(GetFittness(parent2));
+        }
         
         static public void PrintTest()
         {
-            //Console.Write("\n");
-            //Print2DArray(graph);
-            //Console.Write("\n");
+            
             Console.Write("Parent1, with fittness: " + GetFittness(parent1) + " : " );
             PrintCharArray(parent1);
-            Console.Write("Parent2, with fittness: " + GetFittness(parent2) + " : ");
+            Console.WriteLine("Parent2, with fittness: " + GetFittness(parent2) + " : ");
             PrintCharArray(parent2);
             Console.Write("\n");
 
